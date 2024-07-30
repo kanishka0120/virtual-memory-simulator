@@ -61,6 +61,10 @@ lru_simulator = LRU_VirtualMemorySimulator(capacity)
 for page_number, write in page_sequence:
     lru_simulator.access_page(page_number, write)
 lru_simulator.display_state()
+#Outputs
+![output](https://github.com/user-attachments/assets/21d177c3-863d-449e-a9dc-8894d7b719ca)
+![output2](https://github.com/user-attachments/assets/822785fc-bfc2-4be1-9371-eb7deee80e97)
+![output3](https://github.com/user-attachments/assets/8659d964-3e5f-40de-b7ae-f107ae99dee8)
 
 
 
