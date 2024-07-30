@@ -63,8 +63,11 @@ for page_number, write in page_sequence:
 lru_simulator.display_state()
 ```
 #OUTPUT
+
 ![output](https://github.com/user-attachments/assets/24848316-4c83-4fb6-9a28-58ec15d6e058)
+
 ![output2](https://github.com/user-attachments/assets/687bf317-fb81-4583-bfe3-39f266245911)
+
 ![output3](https://github.com/user-attachments/assets/5667c0a7-2a3c-4a0d-b1b5-3732e99c35da)
 
 
