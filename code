@@ -1,0 +1,89 @@
+class Page:
+    def __init__(self, number):
+        self.number = number
+        self.is_cow = False  # Initially, the page is not marked as copy-on-write
+
+class VirtualMemorySimulator:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.memory = []
+        self.page_faults = 0
+        self.page_map = {}
+
+    def access_page(self, page_number, write=False):
+        page = self.page_map.get(page_number)
+
+        # Simulating demand paging: load page if not present
+        if not page:
+            if len(self.memory) >= self.capacity:
+                self.replace_page()
+            page = Page(page_number)
+            self.memory.append(page)
+            self.page_map[page_number] = page
+            self.page_faults += 1
+            print(f"Page fault! Loading page {page_number}")
+        else:
+            print(f"Accessing page {page_number}")
+
+        # Simulating Copy-on-Write
+        if write and page.is_cow:
+            print(f"Page {page_number} is copy-on-write. Creating a new copy.")
+            page = Page(page_number)
+            self.memory.append(page)
+            self.page_map[page_number] = page
+
+        # Mark the page as copy-on-write if it's being written to
+        if write:
+            page.is_cow = True
+
+    def replace_page(self):
+        raise NotImplementedError("This method should be implemented by subclasses.")
+
+    def display_state(self):
+        print("Memory State:")
+        for page in self.memory:
+            print(f"Page {page.number} (COW: {page.is_cow})")
+        print(f"Total Page Faults: {self.page_faults}\n")
+
+class FIFO_VirtualMemorySimulator(VirtualMemorySimulator):
+    def replace_page(self):
+        replaced_page = self.memory.pop(0)
+        del self.page_map[replaced_page.number]
+        print(f"Replacing page {replaced_page.number} using FIFO")
+
+class LRU_VirtualMemorySimulator(VirtualMemorySimulator):
+    def __init__(self, capacity):
+        super().__init__(capacity)
+        self.recent_usage = []
+
+    def access_page(self, page_number, write=False):
+        super().access_page(page_number, write)
+        if page_number in self.recent_usage:
+            self.recent_usage.remove(page_number)
+        self.recent_usage.append(page_number)
+
+    def replace_page(self):
+        lru_page_number = self.recent_usage.pop(0)
+        lru_page = self.page_map.pop(lru_page_number)
+        self.memory.remove(lru_page)
+        print(f"Replacing page {lru_page_number} using LRU")
+
+# Sample page access sequence
+page_sequence = [(7, False), (0, False), (1, False), (2, False), (0, True), 
+                 (3, False), (0, True), (4, False), (2, False), (3, True), 
+                 (0, True), (3, True), (2, False)]
+capacity = 4
+
+# FIFO Simulation
+print("FIFO Page Replacement with Demand Paging and Copy-on-Write:")
+fifo_simulator = FIFO_VirtualMemorySimulator(capacity)
+for page_number, write in page_sequence:
+    fifo_simulator.access_page(page_number, write)
+fifo_simulator.display_state()
+
+# LRU Simulation
+print("LRU Page Replacement with Demand Paging and Copy-on-Write:")
+lru_simulator = LRU_VirtualMemorySimulator(capacity)
+for page_number, write in page_sequence:
+    lru_simulator.access_page(page_number, write)
+lru_simulator.display_state()
